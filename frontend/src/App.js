@@ -26,7 +26,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        'https://tu-servidor-seguro.com/backend/login.php', 
+        'https://18.220.21.195/api/login.php', 
         { usuario, contrasena },
         { 
           headers: { 'Content-Type': 'application/json' },
