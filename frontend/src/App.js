@@ -18,13 +18,18 @@ function App() {
     e.preventDefault();
     setError('');
 
+    if (!validateInput(usuario)) {
+      setError('Usuario no válido');
+      return;
+    }
+
     try {
       const response = await axios.post(
-        'https://18.220.21.195/api/login.php', 
+        '/api/login.php',
         { usuario, contrasena },
-        { 
+        {
           headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,  
+          withCredentials: true,
         }
       );
 
