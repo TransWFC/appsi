@@ -18,12 +18,6 @@ function App() {
     e.preventDefault();
     setError('');
 
-    // Validación de entradas antes de enviarlas
-    if (!validateInput(usuario) || contrasena.length < 6) {
-      setError('Usuario o contraseña no válidos.');
-      return;
-    }
-
     try {
       const response = await axios.post(
         'https://18.220.21.195/api/login.php', 
