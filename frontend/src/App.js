@@ -30,7 +30,7 @@ function App() {
         { usuario, contrasena },
         { 
           headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,  // Permite cookies seguras si el backend las usa
+          withCredentials: true,  
         }
       );
 

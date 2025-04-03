@@ -2,20 +2,17 @@
 header('Access-Control-Allow-Origin: *');  
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
-header('Content-Type: application/json');
 
 function openConnection() {
     $servername = "localhost";
     $username = "root";
-    $password = ""; 
+    $password = "Moreno0310SM21"; 
     $dbname = "seguridad";  
 
     $conn = new mysqli($servername, $username, $password, $dbname);
 
     if ($conn->connect_error) {
-        http_response_code(500);
-        echo json_encode(["error" => "Database connection failed"]);
-        exit();
+        die("Connection failed: " . $conn->connect_error);
     }
     return $conn;
 }
@@ -29,42 +26,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $json = file_get_contents("php://input");
     $data = json_decode($json, true);
 
+    // Depurar: Ver qué está recibiendo PHP
+    error_log("Datos recibidos: " . print_r($data, true));
+
     if (!isset($data['usuario']) || !isset($data['contrasena'])) {
-        http_response_code(400);
-        echo json_encode(["error" => "Datos incompletos"]);
-        exit();
+        die("Error: Datos incompletos");
     }
 
-    $usuario = trim($data['usuario']);
-    $contrasena = trim($data['contrasena']);
-
-    // Validaciones de entrada (Evita inyección y ataques XSS)
-    if (empty($usuario) || empty($contrasena) || !preg_match('/^[a-zA-Z0-9_]{3,30}$/', $usuario)) {
-        http_response_code(400);
-        echo json_encode(["error" => "Usuario o contraseña no válidos"]);
-        exit();
-    }
+    $usuario = $data['usuario'];
+    $contrasena = $data['contrasena'];
 
     $conn = openConnection();
 
-    $query = "SELECT contrasena FROM usuarios WHERE usuario = ?";
+    $query = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
     
     if ($stmt = $conn->prepare($query)) {
-        $stmt->bind_param("s", $usuario);
+        $stmt->bind_param("ss", $usuario, $contrasena);
         $stmt->execute();
-        $stmt->bind_result($hashed_password);
-        
-        if ($stmt->fetch() && password_verify($contrasena, $hashed_password)) {
-            echo json_encode(["status" => "success"]);
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            echo 'success'; 
         } else {
-            http_response_code(401);
-            echo json_encode(["error" => "Credenciales incorrectas"]);
+            echo 'failure'; 
         }
 
         $stmt->close();
-    } else {
-        http_response_code(500);
-        echo json_encode(["error" => "Error en la consulta"]);
     }
 
     closeConnection($conn);
