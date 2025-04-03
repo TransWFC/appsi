@@ -9,8 +9,9 @@ function App() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // Update validation to check for a valid email format
   const validateInput = (input) => {
-    const regex = /^[a-zA-Z0-9_]{3,30}$/;  // Solo permite caracteres seguros
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;  // Email regex
     return regex.test(input);
   };
 
@@ -19,7 +20,7 @@ function App() {
     setError('');
 
     if (!validateInput(usuario)) {
-      setError('Usuario no válido');
+      setError('Correo electrónico no válido');
       return;
     }
 
@@ -48,9 +49,9 @@ function App() {
       <h2>Inicio de sesión</h2>
       <form onSubmit={handleLogin}>
         <input
-          type="text"
+          type="email"  // Change input type to "email"
           className="login-input"
-          placeholder="Usuario"
+          placeholder="Correo electrónico"
           value={usuario}
           onChange={(e) => setUsuario(e.target.value)}
           required
