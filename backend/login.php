@@ -6,7 +6,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 function openConnection() {
     $servername = "localhost";
     $username = "root";
-    $password = "Moreno0310SM21"; 
+    $password = ""; 
     $dbname = "seguridad";  
 
     $conn = new mysqli($servername, $username, $password, $dbname);
