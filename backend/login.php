@@ -10,6 +10,7 @@ function openConnection() {
     $database = "seguridad";
     
     $conn = new mysqli($host, $user, $password, $database);
+
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
@@ -21,41 +22,44 @@ function closeConnection($conn) {
 }
 
 $json = file_get_contents("php://input");
+error_log("JSON crudo recibido: " . $json); // <-- esto imprime lo que llega
+
 $data = json_decode($json, true);
+error_log("JSON decodificado: " . print_r($data, true)); // <-- esto imprime el arreglo
 
-if (!isset($data['usuario']) || !isset($data['contrasena'])) {
-    die(json_encode(["status" => "failure", "error" => "Datos incompletos"]));
-}
+    // Leer y decodificar el JSON recibido
+    $json = file_get_contents("php://input");
+    $data = json_decode($json, true);
 
-$usuario = $data['usuario'];
-$contrasena = $data['contrasena'];
+    // Depurar: Ver qué está recibiendo PHP
+    error_log("Datos recibidos: " . print_r($data, true));
 
-$conn = openConnection();
 
-// Selecciona solo el hash de la contraseña del usuario
-$query = "SELECT contrasena FROM usuarios WHERE usuario = ?";
+    if (!isset($data['usuario']) || !isset($data['contrasena'])) {
+        die("Error: Datos incompletos");
+    }
 
-if ($stmt = $conn->prepare($query)) {
-    $stmt->bind_param("s", $usuario);
-    $stmt->execute();
-    $stmt->store_result();
+    $usuario = $data['usuario'];
+    $contrasena = $data['contrasena'];
+   
+    $conn = openConnection();
 
-    if ($stmt->num_rows === 1) {
-        $stmt->bind_result($hashGuardado);
-        $stmt->fetch();
+    $query = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
+    
+    if ($stmt = $conn->prepare($query)) {
+        $stmt->bind_param("ss", $usuario, $contrasena);
+        $stmt->execute();
+        $stmt->store_result();
 
-        // Verificar la contraseña ingresada con el hash
-        if (password_verify($contrasena, $hashGuardado)) {
+        if ($stmt->num_rows > 0) {
             echo json_encode(["status" => "success"]);
         } else {
             echo json_encode(["status" => "failure", "error" => "Credenciales incorrectas"]);
         }
-    } else {
-        echo json_encode(["status" => "failure", "error" => "Usuario no encontrado"]);
+
+        $stmt->close();
     }
 
-    $stmt->close();
-}
+    closeConnection($conn);
 
-closeConnection($conn);
 ?>
