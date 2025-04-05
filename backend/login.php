@@ -2,6 +2,7 @@
 header('Access-Control-Allow-Origin: *');  
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
+header('Content-Type: application/json');
 
 function openConnection() {
     $host = "localhost";
@@ -10,9 +11,8 @@ function openConnection() {
     $database = "seguridad";
     
     $conn = new mysqli($host, $user, $password, $database);
-     
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        die(json_encode(["status" => "error", "error" => "Connection failed"]));
     }
     return $conn;
 }
@@ -22,15 +22,14 @@ function closeConnection($conn) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Leer y decodificar el JSON recibido
     $json = file_get_contents("php://input");
     $data = json_decode($json, true);
 
-    // Depurar: Ver qué está recibiendo PHP
     error_log("Datos recibidos: " . print_r($data, true));
 
     if (!isset($data['usuario']) || !isset($data['contrasena'])) {
-        die("Error: Datos incompletos");
+        echo json_encode(["status" => "error", "error" => "Datos incompletos"]);
+        exit;
     }
 
     $usuario = $data['usuario'];
@@ -46,9 +45,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            echo 'success'; 
+            echo json_encode(["status" => "success"]);
         } else {
-            echo 'failure'; 
+            echo json_encode(["status" => "failure", "error" => "Credenciales incorrectas"]);
         }
 
         $stmt->close();
