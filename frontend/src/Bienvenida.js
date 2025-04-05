@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles/style.css';
 
 function Bienvenida() {
@@ -15,7 +15,7 @@ function Bienvenida() {
   // Fetch the coffee menu from the server
   const fetchMenu = async () => {
     try {
-      const response = await fetch('/api/menu');
+      const response = await fetch('/api/crud.php');
       const data = await response.json();
       setMenu(data);
     } catch (error) {
@@ -28,7 +28,7 @@ function Bienvenida() {
     e.preventDefault();
     if (newItem.name && newItem.price) {
       try {
-        const response = await fetch('/api/menu', {
+        const response = await fetch('/api/crud.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ function Bienvenida() {
     e.preventDefault();
     if (editItem && editItem.name && editItem.price) {
       try {
-        const response = await fetch('/api/menu', {
+        const response = await fetch('/api/crud.php', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ function Bienvenida() {
   // Handle deleting a coffee item
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/menu?id=${id}`, {
+      const response = await fetch(`/api/crud.php?id=${id}`, {
         method: 'DELETE',
       });
 
@@ -112,41 +112,122 @@ function Bienvenida() {
       <br />
       <h1>¡Bienvenido!</h1>
       <br />
+      <br />
       <p>Has iniciado sesión con éxito.</p>
+      <div
+  className="menu-container"
+  style={{
+    backgroundColor: '#f0f8ff',
+    borderRadius: '20px',
+    padding: '20px',
+    maxWidth: '600px',
+    margin: '0 auto',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+  }}
+>
+  <h2 style={{ color: '#004080', marginBottom: '10px' }}>Coffee Menu</h2>
+  <ul style={{ listStyle: 'none', padding: 0 }}>
+    {menu.map((item) => (
+      <li
+        key={item.id}
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '10px',
+          marginBottom: '8px',
+          border: '1px solid #b3d1ff',
+          borderRadius: '20px',
+          backgroundColor: '#e6f0ff',
+        }}
+      >
+        <span style={{ color: '#003366' }}>
+          {item.name} - ${item.price}
+        </span>
+        <div>
+          <button
+            onClick={() => setEditItem(item)}
+            style={{
+              marginRight: '8px',
+              backgroundColor: '#3399ff',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+            }}
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => handleDelete(item.id)}
+            style={{
+              backgroundColor: '#ff4d4d',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </li>
+    ))}
+  </ul>
 
-      <div className="menu-container">
-        <h2>Coffee Menu</h2>
-        <ul>
-          {menu.map((item) => (
-            <li key={item.id}>
-              <span>{item.name} - ${item.price}</span>
-              <button onClick={() => setEditItem(item)}>Edit</button>
-              <button onClick={() => handleDelete(item.id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
+  <h3 style={{ color: '#004080', marginTop: '20px' }}>
+    {editItem ? 'Edit Coffee Item' : 'Agregar nuevo cafe'}
+  </h3>
+  <form onSubmit={editItem ? handleUpdate : handleCreate}>
+    <input
+      type="text"
+      name="name"
+      value={editItem ? editItem.name : newItem.name}
+      onChange={handleInputChange}
+      placeholder="Coffee Name"
+      required
+      style={{
+        padding: '10px',
+        marginBottom: '10px',
+        width: '100%',
+        borderRadius: '10px',
+        border: '1px solid #a3c2f2',
+      }}
+    />
+    <input
+      type="number"
+      name="price"
+      value={editItem ? editItem.price : newItem.price}
+      onChange={handleInputChange}
+      placeholder="Price"
+      required
+      style={{
+        padding: '10px',
+        marginBottom: '10px',
+        width: '100%',
+        borderRadius: '10px',
+        border: '1px solid #a3c2f2',
+      }}
+    />
+    <button
+      type="submit"
+      style={{
+        backgroundColor: '#0059b3',
+        color: 'white',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '20px',
+        cursor: 'pointer',
+        width: '100%',
+      }}
+    >
+      {editItem ? 'Update' : 'Add'}
+    </button>
+  </form>
+</div>
 
-        <h3>{editItem ? 'Edit Coffee Item' : 'Add New Coffee Item'}</h3>
-        <form onSubmit={editItem ? handleUpdate : handleCreate}>
-          <input
-            type="text"
-            name="name"
-            value={editItem ? editItem.name : newItem.name}
-            onChange={handleInputChange}
-            placeholder="Coffee Name"
-            required
-          />
-          <input
-            type="number"
-            name="price"
-            value={editItem ? editItem.price : newItem.price}
-            onChange={handleInputChange}
-            placeholder="Price"
-            required
-          />
-          <button type="submit">{editItem ? 'Update' : 'Add'}</button>
-        </form>
-      </div>
     </div>
   );
 }

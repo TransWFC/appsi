@@ -2,7 +2,6 @@
 header('Access-Control-Allow-Origin: *');  
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
-header('Content-Type: application/json');
 
 function openConnection() {
     $host = "localhost";
@@ -11,8 +10,9 @@ function openConnection() {
     $database = "seguridad";
     
     $conn = new mysqli($host, $user, $password, $database);
+
     if ($conn->connect_error) {
-        die(json_encode(["status" => "error", "error" => "Connection failed"]));
+        die("Connection failed: " . $conn->connect_error);
     }
     return $conn;
 }
@@ -21,20 +21,27 @@ function closeConnection($conn) {
     $conn->close();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$json = file_get_contents("php://input");
+error_log("JSON crudo recibido: " . $json); // <-- esto imprime lo que llega
+
+$data = json_decode($json, true);
+error_log("JSON decodificado: " . print_r($data, true)); // <-- esto imprime el arreglo
+
+    // Leer y decodificar el JSON recibido
     $json = file_get_contents("php://input");
     $data = json_decode($json, true);
 
+    // Depurar: Ver qué está recibiendo PHP
     error_log("Datos recibidos: " . print_r($data, true));
 
+
     if (!isset($data['usuario']) || !isset($data['contrasena'])) {
-        echo json_encode(["status" => "error", "error" => "Datos incompletos"]);
-        exit;
+        die("Error: Datos incompletos");
     }
 
     $usuario = $data['usuario'];
     $contrasena = $data['contrasena'];
-
+   
     $conn = openConnection();
 
     $query = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
@@ -54,5 +61,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     closeConnection($conn);
-}
+
 ?>

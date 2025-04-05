@@ -25,12 +25,14 @@ function App() {
     }
 
     try {
+      console.log("Enviando:", { usuario, contrasena });
+
       const response = await axios.post(
         '/api/login.php',
-        { usuario, contrasena },
+        JSON.stringify({ usuario, contrasena }),  // <-- fuerza a JSON válido
         {
           headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,
+          withCredentials: false  // <-- prueba quitando credenciales
         }
       );
 

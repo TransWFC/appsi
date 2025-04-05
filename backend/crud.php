@@ -10,13 +10,12 @@ function openConnection() {
     $database = "seguridad";
     
     $conn = new mysqli($host, $user, $password, $database);
-     
+
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
     return $conn;
 }
-
 function closeConnection($conn) {
     $conn->close();
 }
@@ -24,6 +23,7 @@ function closeConnection($conn) {
 // Handle different CRUD actions
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $conn = openConnection();
+
 
 switch ($requestMethod) {
     case 'GET':
@@ -69,10 +69,12 @@ switch ($requestMethod) {
 
     case 'PUT':
         // Update coffee menu entry
+        echo 'PUT request received';
         $json = file_get_contents("php://input");
         $data = json_decode($json, true);
-
+        echo 'Antes del isset';
         if (isset($data['id']) && isset($data['name']) && isset($data['price'])) {
+            echo 'dentro del isset';
             $id = $data['id'];
             $name = $data['name'];
             $price = $data['price'];
