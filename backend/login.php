@@ -4,10 +4,13 @@ header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
 function openConnection() {
-    $servername = "localhost";
-    $username = "root";
-    $password = ""; 
-    $dbname = "seguridad";  
+    $host = "localhost";
+    $user = "webuser";
+    $password = "password123";
+    $database = "seguridad";
+    
+    $conn = new mysqli($host, $user, $password, $database);
+     
 
     $conn = new mysqli($servername, $username, $password, $dbname);
 
