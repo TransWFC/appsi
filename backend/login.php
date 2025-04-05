@@ -63,3 +63,6 @@ error_log("JSON decodificado: " . print_r($data, true)); // <-- esto imprime el 
     closeConnection($conn);
 
 ?>
+
+
+

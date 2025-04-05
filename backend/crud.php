@@ -24,7 +24,6 @@ function closeConnection($conn) {
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $conn = openConnection();
 
-
 switch ($requestMethod) {
     case 'GET':
         // Read coffee menu
@@ -50,13 +49,16 @@ switch ($requestMethod) {
         $json = file_get_contents("php://input");
         $data = json_decode($json, true);
 
-        if (isset($data['name']) && isset($data['price'])) {
+        if (isset($data['name']) && isset($data['price']) && isset($data['size']) && isset($data['milk_type']) && isset($data['description'])) {
             $name = $data['name'];
             $price = $data['price'];
+            $size = $data['size'];
+            $milk_type = $data['milk_type'];
+            $description = $data['description'];
 
-            $query = "INSERT INTO coffee_menu (name, price) VALUES (?, ?)";
+            $query = "INSERT INTO coffee_menu (name, price, size, milk_type, description) VALUES (?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("sd", $name, $price);
+            $stmt->bind_param("sdsss", $name, $price, $size, $milk_type, $description);
             if ($stmt->execute()) {
                 echo 'Coffee added successfully';
             } else {
@@ -72,16 +74,18 @@ switch ($requestMethod) {
         echo 'PUT request received';
         $json = file_get_contents("php://input");
         $data = json_decode($json, true);
-        echo 'Antes del isset';
-        if (isset($data['id']) && isset($data['name']) && isset($data['price'])) {
-            echo 'dentro del isset';
+
+        if (isset($data['id']) && isset($data['name']) && isset($data['price']) && isset($data['size']) && isset($data['milk_type']) && isset($data['description'])) {
             $id = $data['id'];
             $name = $data['name'];
             $price = $data['price'];
+            $size = $data['size'];
+            $milk_type = $data['milk_type'];
+            $description = $data['description'];
 
-            $query = "UPDATE coffee_menu SET name = ?, price = ? WHERE id = ?";
+            $query = "UPDATE coffee_menu SET name = ?, price = ?, size = ?, milk_type = ?, description = ? WHERE id = ?";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("sdi", $name, $price, $id);
+            $stmt->bind_param("sdssss", $name, $price, $size, $milk_type, $description, $id);
             if ($stmt->execute()) {
                 echo 'Coffee updated successfully';
             } else {
